@@ -1,51 +1,53 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Chat</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.2/signalr.min.js"></script>
+    <title>Welcome</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-        }
-
-        #messagesList {
-            list-style: none;
+            margin: 0;
             padding: 0;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
-            #messagesList li {
-                margin: 5px 0;
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+            button:hover {
+                background-color: #0056b3;
             }
+
+        a {
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
-    <h1>SignalR Chat</h1>
-    <ul id="messagesList"></ul>
-    <input type="text" id="userInput" placeholder="Enter your name" />
-    <input type="text" id="messageInput" placeholder="Enter a message" />
-    <button id="sendButton">Send</button>
-
-    <script>const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/chatHub")
-            .build();
-
-        // Disable send button until connection is established
-        document.getElementById("sendButton").disabled = true;
-
-        connection.on("ReceiveMessage", (user, message) => {
-            const li = document.createElement("li");
-            li.textContent = `${user}: ${message}`;
-            document.getElementById("messagesList").appendChild(li);
-        });
-
-        connection.start().then(() => {
-            document.getElementById("sendButton").disabled = false;
-        }).catch(err => console.error(err.toString()));
-
-        document.getElementById("sendButton").addEventListener("click", () => {
-            const user = document.getElementById("userInput").value;
-            const message = document.getElementById("messageInput").value;
-            connection.invoke("SendMessage", user, message).catch(err => console.error(err.toString()));
-        });</script>
+    <div class="container">
+        <h1>Welcome to the Real-Time Chat!</h1>
+        <a href="/user1"><button>Go to User 1 Page</button></a>
+        <a href="/user2"><button>Go to User 2 Page</button></a>
+    </div>
 </body>
 </html>
