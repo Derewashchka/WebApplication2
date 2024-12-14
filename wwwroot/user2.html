@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat - User 2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.2/signalr.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        #chatContainer {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        #messagesList {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+            #messagesList li {
+                margin: 5px 0;
+            }
+
+        .typing {
+            font-style: italic;
+            color: gray;
+        }
+
+        input, button {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+
+            button:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+    </style>
+</head>
+<body>
+    <header>User 2 Chat</header>
+    <div id="chatContainer">
+        <ul id="messagesList"></ul>
+        <p id="typingIndicator" class="typing" style="display: none;">User 1 is typing...</p>
+        <input type="text" id="userInput" value="User 2" readonly />
+        <input type="text" id="messageInput" placeholder="Enter a message" />
+        <button id="sendButton">Send</button>
+    </div>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .build();
+
+        document.getElementById("sendButton").disabled = true;
+
+        connection.on("ReceiveMessage", (user, message) => {
+            const li = document.createElement("li");
+            li.textContent = `${user}: ${message}`;
+            document.getElementById("messagesList").appendChild(li);
+        });
+
+        connection.on("UserTyping", (user) => {
+            const typingIndicator = document.getElementById("typingIndicator");
+            typingIndicator.textContent = `${user} is typing...`;
+            typingIndicator.style.display = "block";
+
+            setTimeout(() => {
+                typingIndicator.style.display = "none";
+            }, 3000);
+        });
+
+        connection.start().then(() => {
+            document.getElementById("sendButton").disabled = false;
+        }).catch(err => console.error(err.toString()));
+
+        document.getElementById("sendButton").addEventListener("click", () => {
+            const user = document.getElementById("userInput").value;
+            const message = document.getElementById("messageInput").value;
+            connection.invoke("SendMessage", user, message).catch(err => console.error(err.toString()));
+        });
+
+        document.getElementById("messageInput").addEventListener("input", () => {
+            const user = document.getElementById("userInput").value;
+            connection.invoke("NotifyTyping", user).catch(err => console.error(err.toString()));
+        });
+    </script>
+</body>
+</html>
